@@ -6,7 +6,7 @@ module.exports = function(dir, cb){
 	
 	var dataset = {};
 	
-	var barrier = new Barrier(7, function() {
+	var barrier = new Barrier(5, function() {
 		cb({
 			getAgency : function () {
 				return dataset.agency;
@@ -72,7 +72,7 @@ module.exports = function(dir, cb){
 
 	var dataset = {};
 	
-	['agency', 'calendar', 'routes', 'shapes', 'stops', 'stop_times', 'trips'].forEach(function(id){
+	['agency', 'routes', 'shapes', 'stops', 'trips'].forEach(function(id){
 		csv.load(path.join(dir, id+".txt"), function(data) {
 			dataset[id] = data;
 			barrier.submit();
