@@ -1,5 +1,7 @@
 # GTFS Visualizations
 
+**The fork can process large GTFS files.**
+
 GTFS is an abbreviation for General Transit Feed Specification, a 
 standard which “defines a common format for public transportation 
 schedules and associated geographic information” ([source](https://developers.google.com/transit/gtfs/)).
@@ -150,6 +152,10 @@ Based on the GTFS files in `./gtfs/ulm/` this will generate:
 Download [Processing 2.0](https://processing.org/download/). Then open 
 the sketch `./processing/processing.pde` within Processing.
 Execute it and a file `./output/ulm_large.pdf` will be generated.
+
+Alternatively, run:
+
+	processing-java --run ./processing/processing.pde
 
 
 ### Adaption to your city
