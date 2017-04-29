@@ -2,9 +2,15 @@ import java.util.Arrays;
 import processing.pdf.*;
 
 String city; 
-boolean large = true;
-String pathSuffix;
 String[] cities;
+
+public void settings() {
+  if (args !=null && args.length > 1) {
+    size(Integer.parseInt(args[1]), Integer.parseInt(args[1]));
+  } else {
+    size(5100, 5100);
+  }
+}
   
 void setup() {
   /*
@@ -19,31 +25,22 @@ void setup() {
   //"miami";
   //"san-francisco";                  
   //"madrid";
-  
-  
 
   cities[0] = "madrid";
   cities[0] = "washington-dc";
   */
   
-  cities =  new String[1];
-  cities[0] = "HVV";
+  cities = new String[1];
   
-  int w;  
-  
-  if (large) {
-    w = 3500;
-    pathSuffix = "large";
+  if (args != null) {
+    cities[0] = args[0]; 
   } else {
-    w = 700;
-    pathSuffix = "small"; 
+    println("Please specify a city/region");
+    exit();
+    System.exit(1);
   }
-  int h = w;
   
-  //size(w, h, PDF, "render.pdf");
-  size(10500, 10500);
-  
-  beginRecord (PDF, "../output/" + join(cities, "-") + "_" + pathSuffix + ".pdf");
+  beginRecord (PDF, "../output/" + join(cities, "-")  + ".pdf");
   smooth();
   noFill();
  
@@ -65,7 +62,7 @@ void setup() {
   popMatrix();
   endRecord();
    
-  save("../output/" + join(cities, "-") + "_" + pathSuffix + ".png");
+  save("../output/" + join(cities, "-") + ".png");
  exit();
 }
 
@@ -75,7 +72,7 @@ void loadLines() {
   maxmin[0] = 0.0f; 
     
   for (int i = 0; i < cities.length; i++) {
-    String[] maxmin_i = loadStrings("../output/" + cities[i] + "/maxmin_" + pathSuffix + ".lines");
+    String[] maxmin_i = loadStrings("../output/" + cities[i] + "/maxmin.lines");
     if (float(maxmin_i[0]) > maxmin[0])
       maxmin[0] = float(maxmin_i[0]);
   } 
@@ -85,7 +82,7 @@ void drawRoute(String type, color col) {
   for (int i = 0; i < cities.length; i++) {
     BufferedReader reader;
     String lineS;
-    reader = createReader("../output/" + cities[i] + "/data_" + pathSuffix + ".lines");
+    reader = createReader("../output/" + cities[i] + "/data.lines");
     while(true) {
       try {
         lineS = reader.readLine();
@@ -102,9 +99,7 @@ void drawRoute(String type, color col) {
       
       String[] points = line[2].split(",");
   
-      float f = 0.01f;
-      if (large) f = 1.3f;
-      if (large) f = 0.7f;
+      float f = 0.7f;
       
       float strkWeight = log(float(trips)  * f );
       if (strkWeight < 0) strkWeight = 1.0f * f;

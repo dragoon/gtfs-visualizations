@@ -17,14 +17,12 @@ var max;
 var min;
 var bbox;
 var gtfs;
+var render_area;
 
-var large = true;
-if (large) {
-    var render_area = {width: 3400, height: 3400};
-    var pathSuffix = "large";
+if (argv.size === undefined) {
+    render_area = {width: 5000, height: 5000};
 } else {
-    var pathSuffix = "small";
-    var render_area = {width: 600, height: 600};
+    render_area = {width: parseInt(argv.size), height: parseInt(argv.size)};
 }
 
 var requiredFile = "./gtfs/" + argv.gtfs + "/shapes.txt";
@@ -247,8 +245,7 @@ function hash(val) {
 }
 
 function createFile() {
-    fs.truncateSync("./output/" + argv.gtfs + "/data_" + pathSuffix + ".lines", 0, "utf8");
-
+    fs.writeFileSync("./output/" + argv.gtfs + "/data.lines", "", "utf8");
 
     var working = 0;
     var one = 1;
@@ -285,8 +282,8 @@ function createFile() {
 
                     var route_type = segments[segment_index].route_type;
                     var line = trips + "\t" + route_type + "\t" + coords + "\n";
-                    fs.appendFileSync("./output/" + argv.gtfs + "/data_" +
-                        pathSuffix + ".lines", line, "utf8", function (err) {
+                    fs.appendFileSync("./output/" + argv.gtfs + "/data.lines",
+                        line, "utf8", function (err) {
                         if (err) throw err;
                     });
                 }
@@ -303,7 +300,7 @@ function createFile() {
         working += one;
     }
 
-    fs.writeFileSync("./output/" + argv.gtfs + "/maxmin_" + pathSuffix + ".lines", max + "\n" + min, "utf8");
+    fs.writeFileSync("./output/" + argv.gtfs + "/maxmin.lines", max + "\n" + min, "utf8");
 
     debug("Files written.");
 }
