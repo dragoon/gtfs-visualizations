@@ -4,7 +4,7 @@ render:
 	mkdir -p output/
 	mkdir -p output/$(gtfs)/
 	touch output/$(gtfs)/data.lines
-	time node render.js --verbose --gtfs=$(gtfs);
+	time node render.js --verbose --gtfs=$(gtfs) --size=$(size);
 
 clean:
 	rm -r ouptut/

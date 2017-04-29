@@ -19,7 +19,7 @@ var bbox;
 var gtfs;
 var render_area;
 
-if (argv.size === undefined) {
+if (argv.size == "") {
     render_area = {width: 5000, height: 5000};
 } else {
     render_area = {width: parseInt(argv.size), height: parseInt(argv.size)};
