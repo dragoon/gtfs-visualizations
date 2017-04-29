@@ -135,7 +135,7 @@ Download and install [node.js and npm](http://nodejs.org/).
 	$ git clone https://github.com/cmichi/gtfs-visualizations.git
 	$ cd gtfs-visualizations/
 	$ npm install
-	$ make render gtfs=ulm
+	$ make render gtfs=ulm size=5000
 
 Based on the GTFS files in `./gtfs/ulm/` this will generate:
 
@@ -178,13 +178,7 @@ the visualization you can adapt the cities array:
 
 ### Generating other image resolutions
 
-Within `./render.js` change
-
-	var render_area = {width: 600, height: 600};
-
-Within `./processing/processing.pde` change
-
-	size(700, 700);
+Adjust with the ``size`` argument.
 
 
 ### Colors
