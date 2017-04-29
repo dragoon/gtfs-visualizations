@@ -149,13 +149,12 @@ Based on the GTFS files in `./gtfs/ulm/` this will generate:
 	# containing the maximum and minimum count of trips on a shape
 	# in this GTFS feed
 
-Download [Processing 2.0](https://processing.org/download/). Then open 
-the sketch `./processing/processing.pde` within Processing.
-Execute it and a file `./output/ulm_large.pdf` will be generated.
+Download [Processing 2.0](https://processing.org/download/).
+Install ``processing-java`` from the Tools menu.
 
-Alternatively, run:
+Then run:
 
-	processing-java --run ./processing/processing.pde
+	processing-java  --sketch=$PWD/processing --run ulm 5100
 
 
 ### Adaption to your city
