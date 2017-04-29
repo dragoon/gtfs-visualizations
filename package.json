@@ -1,12 +1,12 @@
 {
   "author": "Michael Müller <mich@elmueller.net>",
-  "homepage": "https://github.com/cmichi/gtfs-heatmap",
+  "homepage": "https://github.com/dragoon/gtfs-visualizations",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cmichi/gtfs-heatmap.git"
+    "url": "https://github.com/dragoon/gtfs-visualizations.git"
   },
-  "name": "gtfs-heatmap",
-  "description": "Visualizing GTFS data as a heatmap.",
+  "name": "gtfs-visualizations",
+  "description": "Visualizing GTFS data as a route heatmap.",
   "keywords": ["gtfs", "heatmap"],
   "license": "MIT",
   "version": "0.0.1",
