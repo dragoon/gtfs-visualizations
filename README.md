@@ -137,16 +137,20 @@ Download and install [node.js and npm](http://nodejs.org/).
 	$ git clone https://github.com/cmichi/gtfs-visualizations.git
 	$ cd gtfs-visualizations/
 	$ npm install
-	$ make render gtfs=ulm size=5000
+	$ time node render.js --verbose --gtfs=ulm --poster
+	
+Arguments:
+
+	--size - size of the output image, in px.
+	--poster - whether to make an A0 poster image.
+	--gtfs - name of the folder with GTFS feed.
 
 Based on the GTFS files in `./gtfs/ulm/` this will generate:
-
-	./output/ulm/
 
 	./output/ulm/data.lines
 
 	./output/ulm/maxmin.lines	
-	# containing the maximum and minimum count of trips on a shape
+	# contains the maximum and minimum count of trips on a shape
 	# in this GTFS feed
 
 Download [Processing 2.0](https://processing.org/download/).
@@ -155,31 +159,6 @@ Install ``processing-java`` from the Tools menu.
 Then run:
 
 	processing-java  --sketch=$PWD/processing --run ulm 5100
-
-
-### Adaption to your city
-
-Change those lines within `./processing/processing.pde` :
-
-	cities =  new String[1];
-	cities[0] = "ulm";
-
-to the city you want to display, e.g. `cities[1] = "san-diego";`. 
-Make sure `./gtfs/san-diego/` exists. Also make sure there is a shape file
-(`./gtfs/san-diego/shapes.txt`) available! 
-
-Execute `$ make render gtfs=san-diego` and after this is finished the 
-Processing sketch `./processing/processing.pde`. You will then find your
-visualization generated in `./output/san-diego.png`.
-
-For certain cities (e.g. Los Angeles) multiple separate GTFS feeds 
-are available (e.g. bus, metro, etc.). To render multiple GTFS feeds into
-the visualization you can adapt the cities array:
-
-	cities =  new String[2];
-	cities[0] = "los-angeles";
-	cities[1] = "los-angeles-metro";
-
 
 ### Generating other image resolutions
 
@@ -223,6 +202,11 @@ These are the default colors used. You are free to adapt them.
 	Copyright (c) 2013-2014
 
 		Michael Mueller <http://micha.elmueller.net/>
+		
+	
+	Copyright (c)
+
+		Roman Prokofyev <http://prokofyev.ch/>
 
 	Permission is hereby granted, free of charge, to any person obtaining
 	a copy of this software and associated documentation files (the
