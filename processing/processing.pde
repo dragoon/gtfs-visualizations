@@ -117,11 +117,12 @@ void drawRoute(String type, color col) {
       
       String[] points = line[2].split(",");
   
-      float f = 0.7f;
+      float f = 1.7f;
       
-      float strkWeight = log(float(trips)  * f );
+      float strkWeight = log(float(trips)  * f ) * 3;
       if (strkWeight < 0) strkWeight = 1.0f * f;
       strokeWeight(strkWeight);
+      strokeCap(SQUARE);
         
       float alph = 1.0 + (maxmin[0] / float(trips));
       alph = 15.0f + (log(float(trips)) * 4.0f);
