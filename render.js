@@ -4,14 +4,12 @@ var jquery = require('jquery');
 var argv = require('optimist').argv;
 var fs = require('fs');
 var Gtfs = require(path.join(__dirname, ".", "parser", "loader"));
-var Rainbow = require(path.join(__dirname, "lib", "rainbowvis"));
 
-var rainbow = new Rainbow.Rainbow();
 var shapes;
 var trips;
 var routes;
 var segments = []
-var sequences = []
+var sequences = {}
 var sequences_length = 0
 var max;
 var min;
@@ -19,16 +17,32 @@ var bbox;
 var gtfs;
 var render_area = {width: 5000, height: 5000};
 var render_area_a0 = {width: 9933, height: 9933};
-var center;
-var max_dist = 10000; // meters
+var center_lat;
+var center_lon;
+var max_dist = 20; // kilometers
 
 if (argv.size !== null) {
     render_area = {width: parseInt(argv.size), height: parseInt(argv.size)};
 }
 
+if (argv.center !== null) {
+    var [center_lat, center_lon] = argv.center.split(",");
+}
+
 if (argv.poster !== null) {
     render_area = render_area_a0;
 }
+
+if (argv['max-dist'] !== undefined) {
+    max_dist = parseInt(argv['max-dist']);
+}
+
+debug("Running with parameters:\n");
+debug(`GTFS provider: ${argv.gtfs}`);
+debug(`Render area: ${render_area.width} x ${render_area.height} px`);
+debug(`Center coordinates: ${center_lat}, ${center_lon}`);
+debug(`Max distance from center: ${max_dist}km`);
+
 
 var requiredFile = "./gtfs/" + argv.gtfs + "/shapes.txt";
 if (!fs.existsSync(requiredFile)) {
@@ -48,7 +62,7 @@ Gtfs("./gtfs/" + argv.gtfs + "/", function (data) {
 });
 
 /* possible bug: can there be more route types for one shape? */
-var route_types = [];
+var route_types = {};
 function getRouteTypeForShapeId(shape_id) {
     return route_types[shape_id];
 }
@@ -84,15 +98,23 @@ function prepareData() {
 
     for (var i in shapes) {
         var shape = shapes[i];
+
         if (sequences[shape.shape_id] == undefined)
             sequences[shape.shape_id] = []
 
-        sequences[shape.shape_id][shape.shape_pt_sequence] = shape;
+        // check out of boundaries
+        if (center_lat !== undefined && center_lon !== undefined) {
+            var distance_from_center = getDistanceFromLatLonInKm(shape.shape_pt_lat, shape.shape_pt_lon, center_lat, center_lon);
+            if (distance_from_center <= max_dist) {
+                sequences[shape.shape_id][shape.shape_pt_sequence] = shape;
+            }
+        }
         
     }
 
-    for (var i in sequences)
+    for (var i in sequences) {
         sequences_length++;
+    }
 
     debug("Preparing data finished.");
     debug("\nStarting to create shape segments array with trips per segment...");
@@ -105,9 +127,6 @@ function prepareData() {
         for (var n in sequences[i]) {
             var shape = sequences[i][n];
             var shape_id = shape.shape_id
-
-            adjustBBox([new Number(shape.shape_pt_lat),
-                new Number(shape.shape_pt_lon)]);
 
             if (last_undef == 1 && A == undefined)
                 console.log("shit")
@@ -129,31 +148,31 @@ function prepareData() {
                 // maybe shape from different direction, but on this segment
                 var segment_index2 = hash([B, A]);
 
+                A = B;
+
+                if (trips_on_a_shape[shape_id] == undefined) {
+                    continue
+                }
+
+                var route_type = getRouteTypeForShapeId(shape_id);
+
+                if (route_type == undefined) {
+                    continue;
+                }
+
+                adjustBBox([new Number(shape.shape_pt_lat),
+                    new Number(shape.shape_pt_lon)]);
+                
                 if (segments[segment_index] == undefined) {
                     segments[segment_index] = {
                         "trips": 0
                         , "from": A
                         , "to": B
-                        , "route_type": undefined
+                        , "route_type": route_type
                     }
                 }
 
-                if (trips_on_a_shape[shape_id] == undefined) {
-                    // maybe the shape exists, but
-                    // there are no trips for it
-                    //console.log("shit2")
-                    trips_on_a_shape[shape_id] = 0;
-                    //console.log(shape_id)
-                }
-
-                var route_type = getRouteTypeForShapeId(shape_id);
-                if (route_type != undefined) {
-                    segments[segment_index].route_type = route_type;
-                } else {
-                    //console.log("oh oh. undefined route_type for shape_id " + shape_id);
-                    //return;
-                }
-
+                segments[segment_index].route_type = route_type;
                 segments[segment_index].trips += trips_on_a_shape[shape_id];
 
                 /* check if {B, A} in arr */
@@ -166,8 +185,6 @@ function prepareData() {
 
                 if (segments[segment_index].trips < min || min == undefined)
                     min = segments[segment_index].trips;
-
-                A = B;
             }
         }
     }
@@ -178,9 +195,6 @@ function prepareData() {
 
     debug("max trips per segment: " + max);
     debug("min trips per segment: " + min);
-
-    rainbow.setNumberRange(min, max);
-    rainbow.setSpectrum('blue', 'green', 'yellow', 'red');
 
 }
 
@@ -278,7 +292,6 @@ function createFile() {
                 var segment_index = hash([B, A]);
 
                 if (segments[segment_index] != undefined) {
-                    /* do the trips vary from the - so far - concatenated segments? */
                     trips = segments[segment_index].trips;
                     last_trips = trips;
 
@@ -301,7 +314,7 @@ function createFile() {
         }
         last_trips = trips;
 
-        if ((sequences_length - working) % 5 == 0)
+        if ((sequences_length - working) % 10 == 0)
             debug((sequences_length - working) + " left")
 
         working += one;
@@ -317,4 +330,22 @@ function debug(msg) {
         var now = (new Date());
         console.log(now.getHours() + "h" + now.getMinutes() + "m: " + msg);
     }
+}
+
+function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1);  // deg2rad below
+    var dLon = deg2rad(lon2-lon1);
+    var a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon/2) * Math.sin(dLon/2)
+    ;
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var d = R * c; // Distance in km
+    return d;
+}
+
+function deg2rad(deg) {
+    return deg * (Math.PI/180)
 }
