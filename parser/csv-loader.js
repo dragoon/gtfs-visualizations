@@ -1,47 +1,22 @@
+var csv = require('csv-parser')
 var fs = require("fs");
 
-module.exports = (function(){
-	
-	var load = function(filename, cb) {	
-		
-		fs.readFile(filename, "utf8", function(err, data) {			
-			//console.log(filename);
-			//console.log(data);
+module.exports = (function () {
 
-			if (err || !data) {
-				cb(undefined);
-				return;
-			}
-			
-			data = data.replace(/\"+/g, ""); 
-			data = data.replace(/\r|\t/g, "");
-			
-			var lines = data.split("\n");
-			var cols = lines[0].split(",");		
-			lines.shift();
+    var load = function (filename, cb) {
 
-			var data = [];
-			for (var line in lines) {
-				var fields = lines[line].split(",");
-				var entry = {};
-				var pushIt = false;
-				for (var i = 0; i < fields.length; i++) {
-					var val = fields[i];
-					if (!cols[i]) continue;
-					var key= cols[i].replace(/\s+/g,"");
-					if (key.length > 0 && val.length > 0) {
-						entry[key] = val;
-						pushIt = true;
-					}
-				}
-				if (pushIt) data.push(entry);
-			}
-			
-			cb(data);
-		});
-	};
+        var result = [];
+        fs.createReadStream("./" + filename, {"encoding": "utf8"})
+            .pipe(csv())
+            .on('data', function (row) {
+                result.push(row);
+            }).on('end', function () {
+                // We are done
+                cb(result);
+            });
+    };
 
-	return {
-		load : load
-	};
+    return {
+        load: load
+    };
 })();
