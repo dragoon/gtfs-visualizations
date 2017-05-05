@@ -17,12 +17,17 @@ var max;
 var min;
 var bbox;
 var gtfs;
-var render_area;
+var render_area = {width: 5000, height: 5000};
+var render_area_a0 = {width: 9933, height: 9933};
+var center;
+var max_dist = 10000; // meters
 
-if (argv.size == "") {
-    render_area = {width: 5000, height: 5000};
-} else {
+if (argv.size !== null) {
     render_area = {width: parseInt(argv.size), height: parseInt(argv.size)};
+}
+
+if (argv.poster !== null) {
+    render_area = render_area_a0;
 }
 
 var requiredFile = "./gtfs/" + argv.gtfs + "/shapes.txt";
@@ -76,12 +81,14 @@ function prepareData() {
      */
 
     /* ensure that the shape points are in the correct order */
+
     for (var i in shapes) {
         var shape = shapes[i];
         if (sequences[shape.shape_id] == undefined)
             sequences[shape.shape_id] = []
 
         sequences[shape.shape_id][shape.shape_pt_sequence] = shape;
+        
     }
 
     for (var i in sequences)

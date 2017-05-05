@@ -3,16 +3,27 @@ import processing.pdf.*;
 
 String city; 
 String[] cities;
+PFont f;
+int sizeX = 5100;
+int sizeY = 5100;
+boolean poster=false;
 
 public void settings() {
   if (args !=null && args.length > 1) {
-    size(Integer.parseInt(args[1]), Integer.parseInt(args[1]));
-  } else {
-    size(5100, 5100);
+    if ("poster".equals(args[1])) {
+      poster = true;
+      sizeX = 9933;
+      sizeY = 14043;
+    } else {
+      sizeX = Integer.parseInt(args[1]);
+      sizeY = Integer.parseInt(args[1]);
+    }
   }
+  size(sizeX, sizeY);
 }
   
 void setup() {
+  f = createFont("Proxima Nova",48,true);
   /*
   cities =  new String[2];
   cities[0] = "los-angeles";
@@ -60,6 +71,13 @@ void setup() {
     drawRoute("1", #4daf4a); // subway, metro
     drawRoute("0", #0000ff); // tram
   popMatrix();
+  
+  if (poster) {
+    textFont(f,88);
+    fill(160); 
+    text("Saint Petersburg\nPublic transport routes visuzalization based on GTFS feed by the ogrp.spb.ru\n\n" +
+    "Source code and further information available by the url from the QR-code", 200, sizeY-600);
+  }
   endRecord();
    
   save("../output/" + join(cities, "-") + ".png");
