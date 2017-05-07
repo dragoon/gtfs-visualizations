@@ -10,7 +10,6 @@ var trips;
 var routes;
 var segments = []
 var sequences = {}
-var sequences_length = 0
 var max;
 var min;
 var bbox;
@@ -64,7 +63,21 @@ Gtfs("./gtfs/" + argv.gtfs + "/", function (data) {
 /* possible bug: can there be more route types for one shape? */
 var route_types = {};
 function getRouteTypeForShapeId(shape_id) {
-    return route_types[shape_id];
+    var route_type = route_types[shape_id];
+    var short_type = (route_type/100)>>0;
+    if (short_type == 7) {
+        route_type = 3;
+    }
+    else if (short_type == 1) {
+        route_type = 2;
+    }
+    else if (short_type == 5) {
+        route_type = 1;
+    }
+    else if (short_type == 9) {
+        route_type = 0;
+    }
+    return route_type;
 }
 
 function prepareData() {
@@ -84,16 +97,6 @@ function prepareData() {
             route_types[trip.shape_id] = route_type;
     }
 
-    /*
-     we have to break the shapes in chunks of predecessor/successor,
-     cause there might be overlapping segments of different shapes.
-     [
-     { {x:.., y:..}, {x:.., y:..} }: {
-     trips: 3 	// 3 trips along this segment
-     }
-     ]
-     */
-
     /* ensure that the shape points are in the correct order */
 
     for (var i in shapes) {
@@ -112,81 +115,45 @@ function prepareData() {
         
     }
 
-    for (var i in sequences) {
-        sequences_length++;
-    }
-
     debug("Preparing data finished.");
     debug("\nStarting to create shape segments array with trips per segment...");
 
     for (var i in sequences) {
-        var A = undefined;
-        var B = undefined;
-        var last_undef = 0
+        var prev = undefined;
+        var shape_id = i;
+        var route_type = getRouteTypeForShapeId(shape_id);
 
+        if (route_type == undefined) {
+            continue;
+        }
+        if (trips_on_a_shape[shape_id] == undefined) {
+            continue
+        }
+
+        var tripsN = trips_on_a_shape[shape_id];
+
+        if (tripsN > max || max == undefined)
+            max = tripsN;
+
+        if (tripsN < min || min == undefined)
+            min = tripsN;
+
+        var pts = [];
         for (var n in sequences[i]) {
             var shape = sequences[i][n];
-            var shape_id = shape.shape_id
 
-            if (last_undef == 1 && A == undefined)
-                console.log("shit")
-
-            /* was this the last point in a sequence? */
-            if (n == sequences[i].length - 1 && A == undefined)
-                A = {"lat": shape.shape_pt_lat, "lng": shape.shape_pt_lon};
-
-            if (A == undefined) {
-                A = {"lat": shape.shape_pt_lat, "lng": shape.shape_pt_lon};
-
-                last_undef = 1;
-                continue;
-            } else {
-                last_undef = 0;
-                B = {"lat": shape.shape_pt_lat, "lng": shape.shape_pt_lon};
-                var segment_index = hash([A, B]);
-
-                // maybe shape from different direction, but on this segment
-                var segment_index2 = hash([B, A]);
-
-                A = B;
-
-                if (trips_on_a_shape[shape_id] == undefined) {
-                    continue
-                }
-
-                var route_type = getRouteTypeForShapeId(shape_id);
-
-                if (route_type == undefined) {
-                    continue;
-                }
-
-                adjustBBox([new Number(shape.shape_pt_lat),
+            adjustBBox([new Number(shape.shape_pt_lat),
                     new Number(shape.shape_pt_lon)]);
-                
-                if (segments[segment_index] == undefined) {
-                    segments[segment_index] = {
-                        "trips": 0
-                        , "from": A
-                        , "to": B
-                        , "route_type": route_type
-                    }
-                }
-
-                segments[segment_index].route_type = route_type;
-                segments[segment_index].trips += trips_on_a_shape[shape_id];
-
-                /* check if {B, A} in arr */
-                if (segment_index != segment_index2 && segments[segment_index2] != undefined) {
-                    segments[segment_index].trips = segments[segment_index].trips
-                }
-
-                if (segments[segment_index].trips > max || max == undefined)
-                    max = segments[segment_index].trips;
-
-                if (segments[segment_index].trips < min || min == undefined)
-                    min = segments[segment_index].trips;
-            }
+            pts.push({'lat': shape.shape_pt_lat, 'lon': shape.shape_pt_lon});
         }
+        if (pts.length === 0) {
+            continue;
+        }
+        segments.push({
+            "trips": tripsN,
+            "coordinates": pts,
+            "route_type": route_type
+        });
     }
     debug("Segments created.");
 
@@ -269,55 +236,28 @@ function createFile() {
     fs.writeFileSync("./output/" + argv.gtfs + "/data.lines", "", "utf8");
 
     var working = 0;
-    var one = 1;
+    var segm_length = segments.length;
     debug("\nStarting to create file...");
 
-    for (var i in sequences) {
-        var A = undefined;
-        var B = undefined;
-
-        var last_px;
-        var last_shape;
-        var last_trips = 0;
-        for (var n in sequences[i]) {
-            var shape = sequences[i][n];
-            var px = coord2px(shape.shape_pt_lat, shape.shape_pt_lon);
-
-            if (last_shape != undefined) {
-                A = {"lat": shape.shape_pt_lat, "lng": shape.shape_pt_lon};
-                B = {"lat": last_shape.shape_pt_lat, "lng": last_shape.shape_pt_lon};
-
-                var pts = [{x: new Number(last_px.x), y: new Number(last_px.y)}, {x: new Number(px.x), y: new Number(px.y)}];
-
-                var segment_index = hash([B, A]);
-
-                if (segments[segment_index] != undefined) {
-                    trips = segments[segment_index].trips;
-                    last_trips = trips;
-
-                    var coords = "";
-                    for (var un in pts) {
-                        coords += pts[un].x + " " + pts[un].y + ","
-                    }
-
-                    var route_type = segments[segment_index].route_type;
-                    var line = trips + "\t" + route_type + "\t" + coords + "\n";
-                    fs.appendFileSync("./output/" + argv.gtfs + "/data.lines",
-                        line, "utf8", function (err) {
-                        if (err) throw err;
-                    });
-                }
-            }
-
-            last_px = px;
-            last_shape = shape;
+    for (var i in segments) {
+        var segment = segments[i];
+        var coords = "";
+        for (var un in segment.coordinates) {
+            var px = coord2px(segment.coordinates[un].lat, segment.coordinates[un].lon);
+            coords += px.x + " " + px.y + ","
         }
-        last_trips = trips;
 
-        if ((sequences_length - working) % 10 == 0)
-            debug((sequences_length - working) + " left")
+        var route_type = segment.route_type;
+        var line = segment.trips + "\t" + route_type + "\t" + coords + "\n";
+        fs.appendFileSync("./output/" + argv.gtfs + "/data.lines",
+            line, "utf8", function (err) {
+            if (err) throw err;
+        });
 
-        working += one;
+        if ((segm_length - working) % 10 == 0)
+            debug((segm_length - working) + " left")
+
+        working += 1;
     }
 
     fs.writeFileSync("./output/" + argv.gtfs + "/maxmin.lines", max + "\n" + min, "utf8");
