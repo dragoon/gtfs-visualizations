@@ -7,7 +7,7 @@ PFont f;
 int sizeX = 5000;
 int sizeY = 5000;
 boolean poster=false;
-PImage qrcode;
+PImage cc_icon;
 
 public void settings() {
   if (args !=null && args.length > 1) {
@@ -15,7 +15,6 @@ public void settings() {
       poster = true;
       sizeX = 9933;
       sizeY = 14043;
-      qrcode = loadImage("code.png");
     } else {
       sizeX = Integer.parseInt(args[1]);
       sizeY = Integer.parseInt(args[1]);
