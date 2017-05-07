@@ -1,6 +1,6 @@
 # GTFS Visualizations
 
-**The fork can process large GTFS files.**
+**The fork can process large GTFS files, contains a poster-generation, adds a posibility to restrict area with a certain radius.**
 
 GTFS is an abbreviation for General Transit Feed Specification, a 
 standard which “defines a common format for public transportation 
