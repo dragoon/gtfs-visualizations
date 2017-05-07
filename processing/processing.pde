@@ -4,9 +4,10 @@ import processing.pdf.*;
 String city; 
 String[] cities;
 PFont f;
-int sizeX = 5100;
-int sizeY = 5100;
+int sizeX = 5000;
+int sizeY = 5000;
 boolean poster=false;
+PImage qrcode;
 
 public void settings() {
   if (args !=null && args.length > 1) {
@@ -14,6 +15,7 @@ public void settings() {
       poster = true;
       sizeX = 9933;
       sizeY = 14043;
+      qrcode = loadImage("code.png");
     } else {
       sizeX = Integer.parseInt(args[1]);
       sizeY = Integer.parseInt(args[1]);
@@ -23,7 +25,7 @@ public void settings() {
 }
   
 void setup() {
-  f = createFont("Proxima Nova",48,true);
+  f = createFont("Lato",48,true);
   /*
   cities =  new String[2];
   cities[0] = "los-angeles";
@@ -57,8 +59,12 @@ void setup() {
  
   stroke(255, 0, 0);
   strokeWeight(1);
-  background(#191919);
+  background(#000000);
   
+  if (poster) {
+    pushMatrix();
+    translate(0, 2000);
+  }
   translate(50, 50);
   pushMatrix();   
     loadLines();
@@ -69,14 +75,17 @@ void setup() {
     drawRoute("3", #e41a1c); // bus
     drawRoute("2", #984ea3); // rail, inter-city
     drawRoute("1", #4daf4a); // subway, metro
-    drawRoute("0", #0000ff); // tram
+    drawRoute("0", #1976d2); // tram
   popMatrix();
   
   if (poster) {
+    popMatrix();
     textFont(f,88);
     fill(160); 
     text("Saint Petersburg\nPublic transport routes visuzalization based on GTFS feed by the ogrp.spb.ru\n\n" +
-    "Source code and further information available by the url from the QR-code", 200, sizeY-600);
+    "Source code and further information are available at github.com/dragoon/gtfs-visualizations", 900, sizeY-600);
+    
+    text("Created by Roman Prokofyev\nLicense Creative Commons Attribution 4.0 Unported", sizeX - 3500, sizeY-300);
   }
   endRecord();
    
@@ -119,7 +128,7 @@ void drawRoute(String type, color col) {
   
       float f = 1.7f;
       
-      float strkWeight = log(float(trips)  * f ) * 3;
+      float strkWeight = log(float(trips)  * f ) * 5;
       if (strkWeight < 0) strkWeight = 1.0f * f;
       strokeWeight(strkWeight);
       strokeCap(SQUARE);
