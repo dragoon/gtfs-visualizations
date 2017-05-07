@@ -21,15 +21,15 @@ var center_lat;
 var center_lon;
 var max_dist = 20; // kilometers
 
-if (argv.size !== null) {
+if (argv.size !== undefined) {
     render_area = {width: parseInt(argv.size), height: parseInt(argv.size)};
 }
 
-if (argv.center !== null) {
+if (argv.center !== undefined) {
     var [center_lat, center_lon] = argv.center.split(",");
 }
 
-if (argv.poster !== null) {
+if (argv.poster !== undefined) {
     render_area = render_area_a0;
 }
 
