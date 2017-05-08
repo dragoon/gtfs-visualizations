@@ -7,7 +7,8 @@ PFont f;
 int sizeX = 5000;
 int sizeY = 5000;
 boolean poster=false;
-PImage cc_icon;
+PShape cc_icon;
+PShape provider_icon;
 
 public void settings() {
   if (args !=null && args.length > 1) {
@@ -24,7 +25,9 @@ public void settings() {
 }
   
 void setup() {
-  f = createFont("Lato",48,true);
+  cc_icon = loadShape("CC-BY_icon.svg");
+  provider_icon = loadShape(args[0] + ".svg");
+  f = createFont("Lato", 48, true);
   /*
   cities =  new String[2];
   cities[0] = "los-angeles";
@@ -80,11 +83,13 @@ void setup() {
   if (poster) {
     popMatrix();
     textFont(f,88);
-    fill(160); 
+    fill(120); 
     text("Saint Petersburg\nPublic transport routes visuzalization based on GTFS feed by the ogrp.spb.ru\n\n" +
-    "Source code and further information are available at github.com/dragoon/gtfs-visualizations", 900, sizeY-600);
+    "Source code and further information are available at github.com/dragoon/gtfs-visualizations", 600, sizeY-600);
+    shape(provider_icon, 200, sizeY-564-190, 270, 564);
     
-    text("Created by Roman Prokofyev\nLicense Creative Commons Attribution 4.0 Unported", sizeX - 3500, sizeY-300);
+    text("\nCreated by Roman Prokofyev\n\nLicense Creative Commons Attribution 4.0 Unported", sizeX - 3500, sizeY-600);
+    shape(cc_icon, sizeX-528-600, sizeY-186-200, 528, 186);
   }
   endRecord();
    
@@ -132,9 +137,12 @@ void drawRoute(String type, color col) {
       strokeWeight(strkWeight);
       strokeCap(SQUARE);
         
-      float alph = 1.0 + (maxmin[0] / float(trips));
-      alph = 15.0f + (log(float(trips)) * 4.0f);
-      alph = 3.0f + (log(float(trips)) * 0.7f);
+      float alph = 200 * (float(trips)/maxmin[0]);
+      if (alph < 30.0f) {
+        alph = 30.0f;
+      }
+      //alph = 15.0f + (log(float(trips)) * 4.0f);
+      //alph = 3.0f + (log(float(trips)) * 0.7f);
       
       stroke(col, alph);
       
