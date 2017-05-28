@@ -13,7 +13,7 @@
   "dependencies": {
 	"path": "0.4.x",
 	"jquery": "1.11",
-	"optimist": "0.5.x"
+	"optimist": "0.5.x",
         "csv-parser": "1.11.0"
   }
 }
