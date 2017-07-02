@@ -1,11 +1,11 @@
-var csv = require('csv-parser')
-var fs = require("fs");
+const csv = require('csv-parser');
+const fs = require("fs");
 
 module.exports = (function () {
 
-    var load = function (filename, cb) {
+    let load = function (filename, cb) {
 
-        var result = [];
+        let result = [];
         fs.createReadStream("./" + filename, {"encoding": "utf8"})
             .pipe(csv())
             .on('data', function (row) {
