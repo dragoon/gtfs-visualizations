@@ -93,6 +93,7 @@ function getRouteTypeForShapeId(shape_id) {
 function prepareData() {
     debug("Starting to prepare data...");
 
+    debug("Starting trip iteration...");
     /* count the trips on a certain id */
     var trips_on_a_shape = [];
     for (var i in trips) {
@@ -107,8 +108,11 @@ function prepareData() {
             route_types[trip.shape_id] = route_type;
     }
 
+    debug("Finished trip iteration...");
+
     /* ensure that the shape points are in the correct order */
 
+    debug("Starting shape iteration...");
     for (var i in shapes) {
         var shape = shapes[i];
 
