@@ -1,31 +1,30 @@
-var path = require('path');
-var crypto = require('crypto');
-var jquery = require('jquery');
-var argv = require('optimist').argv;
-var fs = require('fs');
-var Gtfs = require(path.join(__dirname, ".", "parser", "loader"));
+const path = require('path');
+const crypto = require('crypto');
+const jquery = require('jquery');
+const argv = require('optimist').argv;
+const fs = require('fs');
+const Gtfs = require(path.join(__dirname, ".", "parser", "loader"));
 
-var shapes;
-var trips;
-var routes;
-var segments = []
-var sequences = {}
-var max;
-var min;
-var bbox;
-var gtfs;
-var render_area = {width: 5000, height: 5000};
-var render_area_a0 = {width: 9933, height: 9933};
-var center_lat;
-var center_lon;
-var max_dist = 20; // kilometers
+let shapes;
+let trips;
+let segments = [];
+let sequences = {};
+let max;
+let min;
+let bbox;
+let gtfs;
+let render_area = {width: 5000, height: 5000};
+let render_area_a0 = {width: 9933, height: 9933};
+let center_lat;
+let center_lon;
+let max_dist = 20; // kilometers
 
 if (argv.size !== undefined) {
     render_area = {width: parseInt(argv.size), height: parseInt(argv.size)};
 }
 
 if (argv.center !== undefined) {
-    var [center_lat, center_lon] = argv.center.split(",");
+    let [center_lat, center_lon] = argv.center.split(",");
 }
 
 if (argv.poster !== undefined) {
@@ -43,7 +42,7 @@ debug(`Center coordinates: ${center_lat}, ${center_lon}`);
 debug(`Max distance from center: ${max_dist}km`);
 
 
-var requiredFile = "./gtfs/" + argv.gtfs + "/shapes.txt";
+let requiredFile = "./gtfs/" + argv.gtfs + "/shapes.txt";
 if (!fs.existsSync(requiredFile)) {
     console.error("\nERROR: " + requiredFile + " DOES NOT EXIST!\nEXITING.\n");
     process.exit(1);
@@ -61,7 +60,7 @@ Gtfs("./gtfs/" + argv.gtfs + "/", function (data) {
 });
 
 /* possible bug: can there be more route types for one shape? */
-var route_types = {};
+let route_types = {};
 function getRouteTypeForShapeId(shape_id) {
     var route_type = route_types[shape_id];
     var short_type = (route_type/100)>>0;
@@ -166,8 +165,8 @@ function prepareData() {
 }
 
 function coord2px(lat, lng) {
-    var coordX = bbox.width_f * (lng - bbox.left)
-    var coordY = bbox.height_f * (bbox.top - lat)
+    var coordX = bbox.width_f * (lng - bbox.left);
+    var coordY = bbox.height_f * (bbox.top - lat);
 
     return {x: coordX, y: coordY};
 }
@@ -226,8 +225,8 @@ function adjustBBox(coords) {
 }
 
 function hash(val) {
-    var md5 = crypto.createHash('sha1');
-    md5.update(JSON.stringify(val), "ascii")
+    let md5 = crypto.createHash('sha1');
+    md5.update(JSON.stringify(val), "ascii");
 
     return md5.digest("hex")
 }
@@ -255,7 +254,7 @@ function createFile() {
         });
 
         if ((segm_length - working) % 10 == 0)
-            debug((segm_length - working) + " left")
+            debug((segm_length - working) + " left");
 
         working += 1;
     }
@@ -267,22 +266,22 @@ function createFile() {
 
 function debug(msg) {
     if (argv.verbose) {
-        var now = (new Date());
+        let now = (new Date());
         console.log(now.getHours() + "h" + now.getMinutes() + "m: " + msg);
     }
 }
 
 function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-    var R = 6371; // Radius of the earth in km
-    var dLat = deg2rad(lat2-lat1);  // deg2rad below
-    var dLon = deg2rad(lon2-lon1);
-    var a =
+    let R = 6371; // Radius of the earth in km
+    let dLat = deg2rad(lat2-lat1);  // deg2rad below
+    let dLon = deg2rad(lon2-lon1);
+    let a =
         Math.sin(dLat/2) * Math.sin(dLat/2) +
         Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
         Math.sin(dLon/2) * Math.sin(dLon/2)
     ;
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    var d = R * c; // Distance in km
+    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    let d = R * c; // Distance in km
     return d;
 }
 
