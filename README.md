@@ -1,6 +1,6 @@
 # GTFS Visualizations
 
-**The fork can process large GTFS files, contains a poster-generation, adds a posibility to restrict area with a certain radius.**
+**The fork can process large GTFS files, contains a poster-generation code, adds a posibility to restrict area with a certain radius, and other improvements.**
 
 GTFS is an abbreviation for General Transit Feed Specification, a 
 standard which “defines a common format for public transportation 
@@ -16,13 +16,7 @@ The thickness and color intensity of the drawn lines is chosen using
 `log(trips_happening_on_this_shape_id)`. All trips in the GTFS feed 
 are counted (not just days or a week).
 
-__Project status:__ Works! You will find information on how to generate
-a visualization for a custom GTFS feed below the gallery: 
 [How to generate a visualization](#how-to-generate-a-visualization).
-
-__Known problems:__ The GTFS parser currently loads the GTFS in memory.
-This means large GTFS feeds will cause problems, if your machine does
-not provide sufficient RAM.
 
 	
 ## Gallery
@@ -124,11 +118,6 @@ the PDF. The templates can be found in `./posters/`.
 
 Click on the images to get a larger preview.
 
-The posters can be downloaded here:
-
- * [Madrid (PDF, 11 MB)](http://media.micha.elmueller.net/projects/gtfs/madrid-poster.pdf)
- * [Madrid, Ulm, Washington, San Diego (PDF, 81 MB)](http://media.micha.elmueller.net/projects/gtfs/4up-poster.pdf)
-
 
 ## How to generate a visualization
 
@@ -137,15 +126,7 @@ Download and install [node.js and npm](http://nodejs.org/).
 	$ git clone https://github.com/cmichi/gtfs-visualizations.git
 	$ cd gtfs-visualizations/
 	$ npm install
-	$ time node render.js --verbose --gtfs=vilnus --poster --max-dist=20 --center=54.6824461,25.2748482
-	
-Arguments:
-
-	--size - size of the output image, in px.
-	--poster - whether to make an A0 poster image.
-	--gtfs - name of the folder with GTFS feed.
-	--max-dist - maximum distance from the center, in kilometers, 20km by default.
-	--center - lat/lon coordinates of the intented center.
+	$ time node render.js --help
 
 Based on the GTFS files in `./gtfs/ulm/` this will generate:
 
