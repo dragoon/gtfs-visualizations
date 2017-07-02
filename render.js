@@ -1,9 +1,24 @@
 const path = require('path');
 const crypto = require('crypto');
 const jquery = require('jquery');
-const argv = require('optimist').argv;
 const fs = require('fs');
 const Gtfs = require(path.join(__dirname, ".", "parser", "loader"));
+
+const argv = require('yargs')
+    .usage('Usage: $0 --verbose --gtfs=[path] --poster --max-dist=[num] --center=[lat,lng]')
+    .demandOption(['gtfs'])
+    .default('max-dist', 20)
+    .boolean('v')
+    .boolean('poster')
+    .alias('v', 'verbose')
+    .help('h')
+    .alias('h', 'help')
+    .describe('v', 'Make verbose')
+    .describe('gtfs', 'Path to a gtfs directory')
+    .describe('max-dist', 'Maximum distance from the center')
+    .describe('center', 'Coordinates of the center')
+    .describe('poster', 'Make for an A0 poster size')
+    .argv;
 
 let shapes;
 let trips;
@@ -17,7 +32,7 @@ let render_area = {width: 5000, height: 5000};
 let render_area_a0 = {width: 9933, height: 9933};
 let center_lat;
 let center_lon;
-let max_dist = 20; // kilometers
+let max_dist = argv['max-dist']; // kilometers
 
 if (argv.size !== undefined) {
     render_area = {width: parseInt(argv.size), height: parseInt(argv.size)};
@@ -27,12 +42,8 @@ if (argv.center !== undefined) {
     let [center_lat, center_lon] = argv.center.split(",");
 }
 
-if (argv.poster !== undefined) {
+if (argv.poster) {
     render_area = render_area_a0;
-}
-
-if (argv['max-dist'] !== undefined) {
-    max_dist = parseInt(argv['max-dist']);
 }
 
 debug("Running with parameters:\n");
@@ -44,7 +55,7 @@ debug(`Max distance from center: ${max_dist}km`);
 
 let requiredFile = "./gtfs/" + argv.gtfs + "/shapes.txt";
 if (!fs.existsSync(requiredFile)) {
-    console.error("\nERROR: " + requiredFile + " DOES NOT EXIST!\nEXITING.\n");
+    console.error("\nERROR: " + requiredFile + " does not exist.\nExiting.\n");
     process.exit(1);
 }
 
