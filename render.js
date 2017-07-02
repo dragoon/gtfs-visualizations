@@ -115,6 +115,9 @@ function prepareData() {
             route_types[trip.shape_id] = route_type;
     });
 
+    // clean
+    route_id_types = null;
+
     debug("Finished trip iteration...");
 
     /* ensure that the shape points are in the correct order */
@@ -133,6 +136,10 @@ function prepareData() {
         }
         
     });
+
+    gtfs = null;
+    shapes = null;
+    trips = null;
 
     debug("Preparing data finished.");
     debug("\nStarting to create shape segments array with trips per segment...");
