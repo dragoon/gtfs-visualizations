@@ -1,6 +1,6 @@
 # GTFS Visualizations
 
-**The fork can process large GTFS files, contains a poster-generation, adds a posibility to restrict area with a certain radius.**
+**The fork can process large GTFS files, contains a poster-generation code, adds a posibility to restrict area with a certain radius, and other improvements.**
 
 GTFS is an abbreviation for General Transit Feed Specification, a 
 standard which “defines a common format for public transportation 
@@ -16,13 +16,7 @@ The thickness and color intensity of the drawn lines is chosen using
 `log(trips_happening_on_this_shape_id)`. All trips in the GTFS feed 
 are counted (not just days or a week).
 
-__Project status:__ Works! You will find information on how to generate
-a visualization for a custom GTFS feed below the gallery: 
 [How to generate a visualization](#how-to-generate-a-visualization).
-
-__Known problems:__ The GTFS parser currently loads the GTFS in memory.
-This means large GTFS feeds will cause problems, if your machine does
-not provide sufficient RAM.
 
 	
 ## Gallery
