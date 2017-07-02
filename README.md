@@ -137,13 +137,15 @@ Download and install [node.js and npm](http://nodejs.org/).
 	$ git clone https://github.com/cmichi/gtfs-visualizations.git
 	$ cd gtfs-visualizations/
 	$ npm install
-	$ time node render.js --verbose --gtfs=ulm --poster
+	$ time node render.js --verbose --gtfs=vilnus --poster --max-dist=20 --center=54.6824461,25.2748482
 	
 Arguments:
 
 	--size - size of the output image, in px.
 	--poster - whether to make an A0 poster image.
 	--gtfs - name of the folder with GTFS feed.
+	--max-dist - maximum distance from the center, in kilometers, 20km by default.
+	--center - lat/lon coordinates of the intented center.
 
 Based on the GTFS files in `./gtfs/ulm/` this will generate:
 
