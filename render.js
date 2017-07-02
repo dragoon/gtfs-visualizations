@@ -258,6 +258,9 @@ function hash(val) {
 }
 
 function createFile() {
+    if (!fs.existsSync("./output/" + argv.gtfs)){
+        fs.mkdirSync("./output/" + argv.gtfs);
+    }
     fs.writeFileSync("./output/" + argv.gtfs + "/data.lines", "", "utf8");
 
     var working = 0;
