@@ -1,3 +1,4 @@
 gtfs/
 node_modules/
 output/
+.idea/
