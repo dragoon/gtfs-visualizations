@@ -74,7 +74,7 @@ function getRouteTypeForShapeId(shape_id) {
     else if (short_type == 5) {
         route_type = 1;
     }
-    else if (short_type == 9) {
+    else if (short_type == 9 || short_type==8) {
         route_type = 0;
     }
     return route_type;
