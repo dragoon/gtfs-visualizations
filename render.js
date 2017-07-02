@@ -39,7 +39,7 @@ if (argv.size !== undefined) {
 }
 
 if (argv.center !== undefined) {
-    let [center_lat, center_lon] = argv.center.split(",");
+    [center_lat, center_lon] = argv.center.split(",");
 }
 
 if (argv.poster) {
@@ -93,6 +93,14 @@ function getRouteTypeForShapeId(shape_id) {
 function prepareData() {
     debug("Starting to prepare data...");
 
+    debug("Starting route types iteration...");
+    let route_id_types = {};
+    gtfs.getRoutes().forEach((route) => {
+        route_id_types[route.route_id] = parseInt(route.route_type);
+    });
+    debug("Finished route type iteration...");
+    debug(`Total routes: ${Object.keys(route_id_types).length}`);
+
     debug("Starting trip iteration...");
     /* count the trips on a certain id */
     let trips_on_a_shape = [];
@@ -102,7 +110,7 @@ function prepareData() {
         else
             trips_on_a_shape[trip.shape_id]++;
 
-        let route_type = 1 * gtfs.getRouteById(trip.route_id).route_type;
+        let route_type = route_id_types[trip.route_id];
         if (route_types[trip.shape_id] == undefined)
             route_types[trip.shape_id] = route_type;
     });
