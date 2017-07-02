@@ -73,8 +73,8 @@ Gtfs("./gtfs/" + argv.gtfs + "/", function (data) {
 /* possible bug: can there be more route types for one shape? */
 let route_types = {};
 function getRouteTypeForShapeId(shape_id) {
-    var route_type = route_types[shape_id];
-    var short_type = (route_type/100)>>0;
+    let route_type = route_types[shape_id];
+    let short_type = (route_type/100)>>0;
     if (short_type == 7) {
         route_type = 3;
     }
@@ -95,45 +95,41 @@ function prepareData() {
 
     debug("Starting trip iteration...");
     /* count the trips on a certain id */
-    var trips_on_a_shape = [];
-    for (var i in trips) {
-        var trip = trips[i];
+    let trips_on_a_shape = [];
+    trips.forEach((trip) => {
         if (trips_on_a_shape[trip.shape_id] == undefined)
             trips_on_a_shape[trip.shape_id] = 1;
         else
             trips_on_a_shape[trip.shape_id]++;
 
-        var route_type = 1 * gtfs.getRouteById(trip.route_id).route_type;
+        let route_type = 1 * gtfs.getRouteById(trip.route_id).route_type;
         if (route_types[trip.shape_id] == undefined)
             route_types[trip.shape_id] = route_type;
-    }
+    });
 
     debug("Finished trip iteration...");
 
     /* ensure that the shape points are in the correct order */
 
     debug("Starting shape iteration...");
-    for (var i in shapes) {
-        var shape = shapes[i];
-
+    shapes.forEach((shape) => {
         if (sequences[shape.shape_id] == undefined)
-            sequences[shape.shape_id] = []
+            sequences[shape.shape_id] = [];
 
         // check out of boundaries
         if (center_lat !== undefined && center_lon !== undefined) {
-            var distance_from_center = getDistanceFromLatLonInKm(shape.shape_pt_lat, shape.shape_pt_lon, center_lat, center_lon);
+            let distance_from_center = getDistanceFromLatLonInKm(shape.shape_pt_lat, shape.shape_pt_lon, center_lat, center_lon);
             if (distance_from_center <= max_dist) {
                 sequences[shape.shape_id][shape.shape_pt_sequence] = shape;
             }
         }
         
-    }
+    });
 
     debug("Preparing data finished.");
     debug("\nStarting to create shape segments array with trips per segment...");
 
     for (var i in sequences) {
-        var prev = undefined;
         var shape_id = i;
         var route_type = getRouteTypeForShapeId(shape_id);
 
