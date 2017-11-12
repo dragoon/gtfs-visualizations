@@ -2,3 +2,5 @@ gtfs/
 node_modules/
 output/
 .idea/
+package-lock.json
+processing/data/*

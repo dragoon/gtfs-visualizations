@@ -1,6 +1,6 @@
 # GTFS Visualizations
 
-**The fork can process large GTFS files, contains a poster-generation code, adds a posibility to restrict area with a certain radius, and other improvements.**
+**The fork can process large GTFS files, contains a poster-generation code, adds a possibility to restrict the visualization area within a certain radius, and other improvements.**
 
 GTFS is an abbreviation for General Transit Feed Specification, a 
 standard which “defines a common format for public transportation 
@@ -21,7 +21,7 @@ are counted (not just days or a week).
 	
 ## Gallery
 
-The colors currenltly used are:
+The currently colors used are:
 
 	tram                    #0000ff	blue
 	subway, metro           #00ff00	green
@@ -36,7 +36,7 @@ The colors currenltly used are:
 
 [![Ulm GTFS Heatmap](https://github.com/cmichi/gtfs-visualizations/raw/master/gallery/small/ulm.png)](https://github.com/cmichi/gtfs-visualizations/raw/master/gallery/large/ulm.png)
 
-Rendering based on an inofficial GTFS feed. There is an official one
+Rendering based on an unofficial GTFS feed. There is an official one
 available, though it does (not yet?) include shapes.
 
 Download: 
