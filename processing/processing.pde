@@ -72,7 +72,7 @@ void setup() {
     fill(120); 
     text("Saint Petersburg\nPublic transport routes visuzalization based on GTFS feed by the ogrp.spb.ru\n\n" +
     "Source code and further information are available at github.com/dragoon/gtfs-visualizations", 600, sizeY-600);
-    shape(provider_icon, 200, sizeY-564-190, 270, 564);
+    shape(provider_icon, 200, sizeY-564-190, provider_icon.width*564/provider_icon.height, 564);
     
     textAlign(RIGHT);
     text("\n\nCreated by Roman Prokofyev\nLicense Creative Commons Attribution 4.0 Unported", sizeX - 1500, sizeY-600);
