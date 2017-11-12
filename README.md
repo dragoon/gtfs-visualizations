@@ -126,13 +126,20 @@ Download and install [node.js and npm](http://nodejs.org/).
 	$ git clone https://github.com/cmichi/gtfs-visualizations.git
 	$ cd gtfs-visualizations/
 	$ npm install
-	$ time node render.js --help
 
-Based on the GTFS files in `./gtfs/ulm/` this will generate:
+For help, run:
 
-	./output/ulm/data.lines
+	$ node render.js --help
 
-	./output/ulm/maxmin.lines	
+For example:
+
+    $ time node render.js --verbose --gtfs=vilnus --poster --max-dist=20 --center=54.6824461,25.2748482
+
+Based on the GTFS files in `./gtfs/vilnus/` this will generate:
+
+	./output/vilnus/data.lines
+
+	./output/vilnus/maxmin.lines
 	# contains the maximum and minimum count of trips on a shape
 	# in this GTFS feed
 
@@ -141,7 +148,7 @@ Install ``processing-java`` from the Tools menu.
 
 Then run:
 
-	processing-java  --sketch=$PWD/processing --run ulm 5100
+	processing-java  --sketch=$PWD/processing --run vilnus poster
 
 ### Generating other image resolutions
 
