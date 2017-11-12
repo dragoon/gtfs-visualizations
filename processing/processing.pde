@@ -69,10 +69,13 @@ void setup() {
   if (poster) {
     popMatrix();
     textFont(f,88);
-    fill(120); 
+    fill(120);
+    float provider_h = 564.0;
+    float provider_w = provider_icon.width*provider_h/provider_icon.height;
+    shape(provider_icon, 200, sizeY-provider_h-190, provider_w, provider_h);
+
     text("Saint Petersburg\nPublic transport routes visuzalization based on GTFS feed by the ogrp.spb.ru\n\n" +
-    "Source code and further information are available at github.com/dragoon/gtfs-visualizations", 600, sizeY-600);
-    shape(provider_icon, 200, sizeY-564-190, provider_icon.width*564/provider_icon.height, 564);
+    "Source code and further information are available at github.com/dragoon/gtfs-visualizations", 380 + provider_w, sizeY-600);
     
     textAlign(RIGHT);
     text("\n\nCreated by Roman Prokofyev\nLicense Creative Commons Attribution 4.0 Unported", sizeX - 1500, sizeY-600);
@@ -80,8 +83,6 @@ void setup() {
     image(okfn_logo, sizeX-350-280, sizeY-380-150, 370, 410);
   }
   endRecord();
-   
-  save("../output/" + join(cities, "-") + ".png");
  exit();
 }
 
