@@ -12,18 +12,18 @@ PShape provider_icon;
 PImage okfn_logo;
 
 public void settings() {
-  if (args !=null && args.length > 1) {
-    if ("poster".equals(args[1])) {
-      okfn_logo = loadImage("okfn_logo.png");
-      poster = true;
-      sizeX = 9933;
-      sizeY = 14043;
-    } else {
-      sizeX = Integer.parseInt(args[1]);
-      sizeY = Integer.parseInt(args[1]);
+    if (args !=null && args.length > 1) {
+        if ("poster".equals(args[1])) {
+            okfn_logo = loadImage("okfn_logo.png");
+            poster = true;
+            sizeX = 9933;
+            sizeY = 14043;
+        } else {
+            sizeX = Integer.parseInt(args[1]);
+            sizeY = Integer.parseInt(args[1]);
+        }
     }
-  }
-  size(sizeX, sizeY);
+    size(sizeX, sizeY);
 }
   
 void setup() {
