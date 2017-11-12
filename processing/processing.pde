@@ -9,10 +9,12 @@ int sizeY = 5000;
 boolean poster=false;
 PShape cc_icon;
 PShape provider_icon;
+PImage okfn_logo;
 
 public void settings() {
   if (args !=null && args.length > 1) {
     if ("poster".equals(args[1])) {
+      okfn_logo = loadImage("okfn_logo.png");
       poster = true;
       sizeX = 9933;
       sizeY = 14043;
@@ -28,22 +30,6 @@ void setup() {
   cc_icon = loadShape("CC-BY_icon.svg");
   provider_icon = loadShape(args[0] + ".svg");
   f = createFont("Lato", 48, true);
-  /*
-  cities =  new String[2];
-  cities[0] = "los-angeles";
-  cities[1] = "los-angeles-metro";
- 
-  //"los-angeles";
-  //"washington-dc";
-  //"san-diego";
-  //"manhattan";
-  //"miami";
-  //"san-francisco";                  
-  //"madrid";
-
-  cities[0] = "madrid";
-  cities[0] = "washington-dc";
-  */
   
   cities = new String[1];
   
@@ -88,8 +74,10 @@ void setup() {
     "Source code and further information are available at github.com/dragoon/gtfs-visualizations", 600, sizeY-600);
     shape(provider_icon, 200, sizeY-564-190, 270, 564);
     
-    text("\nCreated by Roman Prokofyev\n\nLicense Creative Commons Attribution 4.0 Unported", sizeX - 3500, sizeY-600);
-    shape(cc_icon, sizeX-528-600, sizeY-186-200, 528, 186);
+    textAlign(RIGHT);
+    text("\n\nCreated by Roman Prokofyev\nLicense Creative Commons Attribution 4.0 Unported", sizeX - 1500, sizeY-600);
+    shape(cc_icon, sizeX-690-700, sizeY-246-180, 690, 246);
+    image(okfn_logo, sizeX-350-280, sizeY-380-150, 370, 410);
   }
   endRecord();
    
@@ -127,37 +115,37 @@ void drawRoute(String type, color col) {
       String[] line = lineS.split("\t");
       String trips =   line[0];
       String[] route_types = line[1].split(",");
-      
+
       String[] points = line[2].split(",");
-  
+
       float f = 1.7f;
-      
-      float strkWeight = log(float(trips)  * f ) * 5;
+
+      float strkWeight = log(float(trips)  * f ) * 3;
       if (strkWeight < 0) strkWeight = 1.0f * f;
       strokeWeight(strkWeight);
       strokeCap(SQUARE);
-        
-      float alph = 200 * (float(trips)/maxmin[0]);
-      if (alph < 30.0f) {
-        alph = 30.0f;
+
+      float alph = 100 * (float(trips)/maxmin[0]);
+      if (alph < 20.0f) {
+        alph = 20.0f;
       }
       //alph = 15.0f + (log(float(trips)) * 4.0f);
       //alph = 3.0f + (log(float(trips)) * 0.7f);
-      
+
       stroke(col, alph);
-      
-      if (!Arrays.asList(route_types).contains(type) || route_types.length > 1)     
+
+      if (!Arrays.asList(route_types).contains(type) || route_types.length > 1)
         continue;
-    
+
       beginShape();
       for (int n = 0; n < points.length; n++) {
         if (points[n] == "" ) continue;
-  
+
         String[] coords = new String[2];
         coords = points[n].split(" ");
-  
+
         if (coords.length != 2) continue;
-        
+
         vertex(float(coords[0]), float(coords[1]));
       }
       endShape();
