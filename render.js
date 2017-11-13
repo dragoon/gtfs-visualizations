@@ -140,7 +140,6 @@ function prepareData() {
                 sequences[shape.shape_id][shape.shape_pt_sequence] = shape;
             }
         }
-        
     });
 
     gtfs = null;
@@ -240,13 +239,6 @@ function adjustBBox(coords) {
     bbox.height_f = render_area.height / bbox.height;
 }
 
-function hash(val) {
-    let md5 = crypto.createHash('sha1');
-    md5.update(JSON.stringify(val), "ascii");
-
-    return md5.digest("hex")
-}
-
 function createFile() {
     if (!fs.existsSync(argv.out)){
         fs.mkdirSync(argv.out);
@@ -325,10 +317,10 @@ function isAllowedPoint(lat1, lon1, lat2, lon2, max_dist) {
     let dist = getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2);
 
     let max_allowed_dist;
-    if (brng > Math.PI/4 && brng < 5*Math.PI/4) {
+    if (brng > Math.PI/4 && brng < 3*Math.PI/4) {
         max_allowed_dist = max_dist.x / Math.abs(Math.sin(brng));
     } else {
-        max_allowed_dist = max_dist.y / Math.abs(Math.sin(Math.PI - brng));
+        max_allowed_dist = max_dist.y / Math.abs(Math.sin(Math.PI/2 - brng));
     }
     return dist <= max_allowed_dist;
 }
