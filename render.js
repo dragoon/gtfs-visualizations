@@ -1,23 +1,24 @@
 const path = require('path');
-const crypto = require('crypto');
-const jquery = require('jquery');
 const fs = require('fs');
 const Gtfs = require(path.join(__dirname, ".", "parser", "loader"));
 
 const argv = require('yargs')
-    .usage('Usage: $0 --verbose --gtfs=[path] --poster --max-dist=[num] --center=[lat,lng]')
+    .usage('Usage: $0 --verbose --gtfs=[path] [--size=[SIZE]|--poster] --max-dist=[num] --out=[path] --center=[lat,lng]')
     .demandOption(['gtfs'])
     .default('max-dist', 20)
+    .default('size', 5000)
     .boolean('v')
     .boolean('poster')
     .alias('v', 'verbose')
     .help('h')
     .alias('h', 'help')
     .describe('v', 'Make verbose')
-    .describe('gtfs', 'Path to a gtfs directory')
-    .describe('max-dist', 'Maximum distance from the center')
+    .describe('gtfs', 'Path to the gtfs directory')
+    .describe('out', 'Path to the output directory (will be created if doesn\'t exist)')
+    .describe('max-dist', 'Maximum distance from the center on y axis')
+    .describe('size', 'Size of the output drawing in px')
     .describe('center', 'Coordinates of the center')
-    .describe('poster', 'Make for an A0 poster size')
+    .describe('poster', 'Make drawing for A0 poster size')
     .argv;
 
 let shapes;
@@ -28,11 +29,10 @@ let max;
 let min;
 let bbox;
 let gtfs;
-let render_area = {width: 5000, height: 5000};
+let render_area;
 let render_area_a0 = {width: 9933, height: 9933};
 let center_lat;
 let center_lon;
-let max_dist = argv['max-dist']; // kilometers
 
 if (argv.size !== undefined) {
     render_area = {width: parseInt(argv.size), height: parseInt(argv.size)};
@@ -46,11 +46,18 @@ if (argv.poster) {
     render_area = render_area_a0;
 }
 
+if (argv.out === undefined) {
+    argv.out = argv.gtfs;
+}
+
+const max_dist = {y: argv['max-dist'],
+    x: argv['max-dist']*render_area.width/render_area.height}; // kilometers
+
 debug("Running with parameters:\n");
 debug(`GTFS provider: ${argv.gtfs}`);
 debug(`Render area: ${render_area.width} x ${render_area.height} px`);
 debug(`Center coordinates: ${center_lat}, ${center_lon}`);
-debug(`Max distance from center: ${max_dist}km`);
+debug(`Max distance from center: ${max_dist.x}x${max_dist.y}km`);
 
 
 let requiredFile = "./gtfs/" + argv.gtfs + "/shapes.txt";
@@ -129,8 +136,7 @@ function prepareData() {
 
         // check out of boundaries
         if (center_lat !== undefined && center_lon !== undefined) {
-            let distance_from_center = getDistanceFromLatLonInKm(shape.shape_pt_lat, shape.shape_pt_lon, center_lat, center_lon);
-            if (distance_from_center <= max_dist) {
+            if (isAllowedPoint(shape.shape_pt_lat, shape.shape_pt_lon, center_lat, center_lon, max_dist)) {
                 sequences[shape.shape_id][shape.shape_pt_sequence] = shape;
             }
         }
@@ -155,7 +161,7 @@ function prepareData() {
             continue
         }
 
-        var tripsN = trips_on_a_shape[shape_id];
+        const tripsN = trips_on_a_shape[shape_id];
 
         if (tripsN > max || max == undefined)
             max = tripsN;
@@ -163,7 +169,7 @@ function prepareData() {
         if (tripsN < min || min == undefined)
             min = tripsN;
 
-        var pts = [];
+        let pts = [];
         for (var n in sequences[i]) {
             var shape = sequences[i][n];
 
@@ -191,8 +197,8 @@ function prepareData() {
 }
 
 function coord2px(lat, lng) {
-    var coordX = bbox.width_f * (lng - bbox.left);
-    var coordY = bbox.height_f * (bbox.top - lat);
+    const coordX = bbox.width_f * (lng - bbox.left);
+    const coordY = bbox.height_f * (bbox.top - lat);
 
     return {x: coordX, y: coordY};
 }
@@ -212,9 +218,6 @@ function adjustBBox(coords) {
             , bottom: coords[0]
             , width: 0
             , height: 0
-
-            , shift_x: 0
-            , shift_y: 0
         };
     }
 
@@ -235,19 +238,6 @@ function adjustBBox(coords) {
 
     bbox.width_f = render_area.width / bbox.width;
     bbox.height_f = render_area.height / bbox.height;
-
-    /* how much do we need to shift for the points to be in the visible area? */
-    var top_left = coord2px(bbox.left, bbox.top);
-    if (top_left.x < 0)
-    // so much, that the outermost point is on 0
-        bbox.shift_x = -1 * top_left.x;
-    else if (top_left.x > render_area.width)
-        bbox.shift_x = -1 * top_left.x;
-
-    if (top_left.y < 0)
-        bbox.shift_y = -1 * top_left.y;
-    else if (top_left.y > render_area.height)
-        bbox.shift_y = -1 * top_left.y;
 }
 
 function hash(val) {
@@ -258,13 +248,13 @@ function hash(val) {
 }
 
 function createFile() {
-    if (!fs.existsSync("./output/" + argv.gtfs)){
-        fs.mkdirSync("./output/" + argv.gtfs);
+    if (!fs.existsSync(argv.out)){
+        fs.mkdirSync(argv.out);
     }
-    fs.writeFileSync("./output/" + argv.gtfs + "/data.lines", "", "utf8");
+    fs.writeFileSync(argv.out + "/data.lines", "", "utf8");
 
-    var working = 0;
-    var segm_length = segments.length;
+    let working = 0;
+    const segm_length = segments.length;
     debug("\nStarting to create file...");
 
     for (var i in segments) {
@@ -277,7 +267,7 @@ function createFile() {
 
         var route_type = segment.route_type;
         var line = segment.trips + "\t" + route_type + "\t" + coords + "\n";
-        fs.appendFileSync("./output/" + argv.gtfs + "/data.lines",
+        fs.appendFileSync(argv.out + "/data.lines",
             line, "utf8", function (err) {
             if (err) throw err;
         });
@@ -288,7 +278,7 @@ function createFile() {
         working += 1;
     }
 
-    fs.writeFileSync("./output/" + argv.gtfs + "/maxmin.lines", max + "\n" + min, "utf8");
+    fs.writeFileSync(argv.out + "/maxmin.lines", max + "\n" + min, "utf8");
 
     debug("Files written.");
 }
@@ -316,4 +306,29 @@ function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
 
 function deg2rad(deg) {
     return deg * (Math.PI/180)
+}
+
+function getBearing(lat1, lon1, lat2, lon2) {
+    // we assume bearing constant between two points on a small scale
+    let dLon = deg2rad(lon2-lon1);
+
+    const y = Math.sin(dLon) * Math.cos(deg2rad(lat2));
+    const x = Math.cos(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) -
+        Math.sin(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(dLon);
+    // return from 0 to PI
+    return Math.abs(Math.atan2(y, x));
+}
+
+function isAllowedPoint(lat1, lon1, lat2, lon2, max_dist) {
+    let brng = getBearing(lat1, lon1, lat2, lon2);
+
+    let dist = getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2);
+
+    let max_allowed_dist;
+    if (brng > Math.PI/4 && brng < 5*Math.PI/4) {
+        max_allowed_dist = max_dist.x / Math.abs(Math.sin(brng));
+    } else {
+        max_allowed_dist = max_dist.y / Math.abs(Math.sin(Math.PI - brng));
+    }
+    return dist <= max_allowed_dist;
 }
