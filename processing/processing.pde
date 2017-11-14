@@ -57,7 +57,7 @@ void setup() {
     drawRoute("5", #ffff33); // cable car
     drawRoute("4", #ff7f00); // ferry
     drawRoute("3", #e41a1c); // bus
-    drawRoute("2", #984ea3); // rail, inter-city
+    drawRoute("2", #718792); // rail, inter-city
     drawRoute("1", #4daf4a); // subway, metro
     drawRoute("0", #1976d2); // tram
   popMatrix();
