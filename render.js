@@ -30,7 +30,7 @@ let min;
 let bbox;
 let gtfs;
 let render_area;
-let render_area_a0 = {width: 9933, height: 9933};
+let render_area_a0 = {width: 9933, height: 14043};
 let center_lat;
 let center_lon;
 
@@ -51,7 +51,8 @@ if (argv.out === undefined) {
 }
 
 const max_dist = {y: argv['max-dist'],
-    x: argv['max-dist']*render_area.width/render_area.height}; // kilometers
+    x: argv['max-dist']*render_area.width/render_area.height }; // kilometers
+max_dist.max_angle = Math.asin(max_dist.x/Math.sqrt(max_dist.x * max_dist.x + max_dist.y * max_dist.y));
 
 debug("Running with parameters:\n");
 debug(`GTFS provider: ${argv.gtfs}`);
@@ -317,7 +318,7 @@ function isAllowedPoint(lat1, lon1, lat2, lon2, max_dist) {
     let dist = getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2);
 
     let max_allowed_dist;
-    if (brng > Math.PI/4 && brng < 3*Math.PI/4) {
+    if (brng > max_dist.max_angle && brng < Math.PI - max_dist.max_angle) {
         max_allowed_dist = max_dist.x / Math.abs(Math.sin(brng));
     } else {
         max_allowed_dist = max_dist.y / Math.abs(Math.sin(Math.PI/2 - brng));

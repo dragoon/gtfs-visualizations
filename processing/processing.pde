@@ -48,11 +48,7 @@ void setup() {
   stroke(255, 0, 0);
   strokeWeight(1);
   background(#000000);
-  
-  if (poster) {
-    pushMatrix();
-    translate(0, 2000);
-  }
+
   translate(50, 50);
   pushMatrix();   
     loadLines();
@@ -67,7 +63,6 @@ void setup() {
   popMatrix();
   
   if (poster) {
-    popMatrix();
     textFont(f,88);
     fill(120);
     float provider_h = 564.0;
