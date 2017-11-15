@@ -70,7 +70,10 @@ void setup() {
     shape(provider_icon, 200, sizeY-provider_h-190, provider_w, provider_h);
 
     String[] lines = loadStrings("../texts/" + cities[0] + ".txt");
-    text(join(lines, "\n"), 380 + provider_w, sizeY-600);
+    if (lines != null) {
+        text(join(lines,"\n"),380+provider_w,sizeY-600);
+    }
+
     
     textAlign(RIGHT);
     text("\n\nCreated by Roman Prokofyev\nLicense Creative Commons Attribution 4.0 Unported", sizeX - 1500, sizeY-600);
