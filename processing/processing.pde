@@ -69,8 +69,8 @@ void setup() {
     float provider_w = provider_icon.width*provider_h/provider_icon.height;
     shape(provider_icon, 200, sizeY-provider_h-190, provider_w, provider_h);
 
-    text("Saint Petersburg\nPublic transport routes visuzalization based on GTFS feed by the ogrp.spb.ru\n\n" +
-    "Source code and further information are available at github.com/dragoon/gtfs-visualizations", 380 + provider_w, sizeY-600);
+    String[] lines = loadStrings("../texts/" + cities[0] + ".txt");
+    text(join(lines, "\n"), 380 + provider_w, sizeY-600);
     
     textAlign(RIGHT);
     text("\n\nCreated by Roman Prokofyev\nLicense Creative Commons Attribution 4.0 Unported", sizeX - 1500, sizeY-600);

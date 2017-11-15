@@ -1,0 +1,4 @@
+Saint Petersburg
+Public transport routes visuzalization based on GTFS feed by the ogrp.spb.ru
+
+Source code and further information are available at github.com/dragoon/gtfs-visualizations
